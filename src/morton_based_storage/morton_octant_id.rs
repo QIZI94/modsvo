@@ -2,7 +2,7 @@ use std::fmt::{Debug, Write};
 use morton_encoding::{morton_encode, morton_decode};
 
 use super::super::octant_meta::{OctantPlacement, OctantNeighborDirection};
-use super::super::Depth;
+use super::super::octant_meta::Depth;
 
 #[derive(Hash, Copy, Clone,  Eq, PartialEq, PartialOrd)]
 pub struct MortonOctantId(pub u64);
@@ -449,7 +449,7 @@ pub fn children_ids_from_parent_id(parent_morton: u64) -> [MortonOctantId; Octan
 #[cfg(test)]
 mod tests{
     use crate::octant_meta::{OctantNeighborDirection, OctantPlacement};
-	use crate::Depth;
+	use crate::octant_meta::Depth;
     use super::MortonOctantId;
 
 	#[test]
@@ -589,7 +589,7 @@ mod tests{
 	fn test_sides(){
 		
 		for morton_code  in 0..= 7u64 {
-			let a = OctantPlacement::try_from(morton_code as usize).unwrap();
+			let _ = OctantPlacement::try_from(morton_code as usize).unwrap();
 			let [x, y, z]: [u16;3] = morton_encoding::morton_decode(morton_code);
 			println!("{} = [{}, {}, {}]",morton_code, x, y, z);
 		}

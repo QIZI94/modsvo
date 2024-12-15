@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 use super::octant_meta::OctantPlacement;
-use super::Depth;
+use super::octant_meta::Depth;
 use super::octant_storage_trait::{
 	ModifiableOctantStorage,
 	OctantStorage,

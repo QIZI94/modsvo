@@ -9,7 +9,7 @@ mod tests{
 	
 	
 
-    use modsvo::{octant_meta::OctantPlacement,octant_storage_trait::{OctantStorage, ModifiableOctantStorage}, octree_base::{SearchControlFlow, SearchControlFlowResult, SubdivisionControlFlow}, voxels::voxel_cube::VolumetricCube, Depth, SparseOctreeHashed};
+    use modsvo::{octant_meta::OctantPlacement,octant_storage_trait::{OctantStorage, ModifiableOctantStorage}, octree_base::{SearchControlFlow, SearchControlFlowResult, SubdivisionControlFlow}, voxels::voxel_cube::VolumetricCube, octant_meta::Depth, SparseOctreeHashed};
 
 	use modsvo::morton_based_storage::morton_octant_id::MortonOctantId;
 	use modsvo::octree_base::OctantIdTypeInfo;

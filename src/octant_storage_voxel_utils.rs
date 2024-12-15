@@ -2,7 +2,7 @@ use std::collections::VecDeque;
 
 use super::voxel_trait::Voxel;
 use super::octant_meta::OctantPlacement;
-use super::Depth;
+use super::octant_meta::Depth;
 use super::octree_base::OctreeBase;
 use super::octant_storage_trait::{ModifiableOctantStorage, OctantStorage, OctantStorageAccessorMut, StorageError, StorageResult, };
 use super::octant_storage_utils::{SearchControlFlow, SearchControlFlowResult, AssignmentControlFlow, SubdivisionControlFlow};

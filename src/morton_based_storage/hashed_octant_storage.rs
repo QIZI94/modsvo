@@ -2,7 +2,7 @@
 use std::collections::HashMap;
 use super::super::octant_storage_trait::{OctantStorage, ModifiableOctantStorage, StorageError, StorageResult};
 use super::morton_octant_id::{MortonOctantId, MortonParentIdIterator};
-use super::super::Depth;
+use super::super::octant_meta::Depth;
 use super::super::octant_meta::OctantPlacement;
 
 

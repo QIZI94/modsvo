@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
 use super::octant_meta::OctantPlacement;
-use super::Depth;
+use super::octant_meta::Depth;
 pub trait OctantStorage{
 	type OctantId: Copy + PartialEq;
 	/// Iterator which will go through all OctantIds of ancestors of given OctantId(exclusive)

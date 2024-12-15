@@ -8,7 +8,7 @@ use super::octant_storage_trait::{
 	OctantStorageAccessorMut,
 	StorageResult
 };
-use super::Depth;
+use super::octant_meta::Depth;
 pub use super::octant_storage_utils::*;
 
 pub trait OctantIdTypeInfo {

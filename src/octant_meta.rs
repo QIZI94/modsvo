@@ -1,6 +1,8 @@
 use std::fmt::Debug;
 //use serde::{Serialize, Deserialize};
 
+pub type Depth = u8;
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 

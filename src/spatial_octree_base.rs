@@ -1,5 +1,5 @@
 use super::octant_storage_trait::{ModifiableOctantStorage, OctantStorage, OctantStorageAccessorMut, StorageError, StorageResult};
-use super::Depth;
+use super::octant_meta::Depth;
 use super::octant_meta::OctantPlacement;
 use super::{
 	octree_base::{OctreeBase, OctantIdTypeInfo},

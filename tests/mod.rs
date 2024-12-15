@@ -14,7 +14,7 @@ use modsvo::{
 		octree_base::{
 			SearchControlFlow, SearchControlFlowResult
 		},
-		Depth};
+		octant_meta::Depth};
 
 pub fn test_modifiable_octant_storage<Storage: ModifiableOctantStorage<Data = u32>>(storage: &mut Storage, repeat: u8) {
 	if repeat == 0 {

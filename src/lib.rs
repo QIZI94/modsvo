@@ -17,8 +17,6 @@ pub mod morton_based_storage;
 // predefined and ready to use types
 use morton_based_storage::hashed_octant_storage::HashedOctantStorage;
 
-pub type Depth = u8;
-
 pub type SparseOctreeHashed<CustomData> = octree_base::OctreeBase<HashedOctantStorage<CustomData>>;
 pub type SpatialSparseOctreeHashed<CustomData> = spatial_octree_base::SpatialOctreeBase<HashedOctantStorage<CustomData>>;
 

@@ -2,7 +2,7 @@ use glam::{Vec3, Vec3A, Vec4, U16Vec3};
 //use serde::{Deserialize, Serialize};
 
 use super::super::octant_meta::{OctantPlacement, OctantNeighborDirection};
-use super::super::{Depth, voxel_trait::Voxel};
+use super::super::{octant_meta::Depth, voxel_trait::Voxel};
 
 pub type CornerPlacement = OctantPlacement;
 pub const CORNER_COUNT: usize = OctantPlacement::OCTANTS_COUNT;
