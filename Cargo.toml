@@ -11,8 +11,8 @@ path = "src/lib.rs"
 [dependencies]
 derive-deref-rs = "0.1.1"
 morton-encoding = "2.0.1"
-glam ={version = "0.25.0", features = ["serde"]}
-serde = {version = "1.0.195", features = ["derive"] }
+glam ={version = "0.29.2", features = ["serde"]}
+serde = {version = "1.0.216", features = ["derive"] }
 
-[build]
-rustdocflags = ["--cfg", "docsrs", "-Z", "unstable-options", "--enable-per-target-ignores"]
+#[build]
+#rustdocflags = ["--cfg", "docsrs", "-Z", "unstable-options", "--enable-per-target-ignores"]

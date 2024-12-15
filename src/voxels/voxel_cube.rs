@@ -44,7 +44,7 @@ impl VolumetricCube  {
 	}
 
 	pub fn center(&self) -> Vec3A {
-		self.center_and_radius_simd.into()
+		Vec3A::from_vec4(self.center_and_radius_simd)
 	}
 
 	pub fn max(&self) -> Vec3A {
