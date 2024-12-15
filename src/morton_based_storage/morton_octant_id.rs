@@ -448,7 +448,8 @@ pub fn children_ids_from_parent_id(parent_morton: u64) -> [MortonOctantId; Octan
 
 #[cfg(test)]
 mod tests{
-    use crate::shared::morton_voxel_octree::{octant_meta::{OctantNeighborDirection, OctantPlacement}, Depth};
+    use crate::octant_meta::{OctantNeighborDirection, OctantPlacement};
+	use crate::Depth;
     use super::MortonOctantId;
 
 	#[test]

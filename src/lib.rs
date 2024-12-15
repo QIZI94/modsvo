@@ -1,15 +1,20 @@
-pub mod octant_meta;
+// traits
 pub mod octant_storage_trait;
-//pub mod octant_storage_utils;
-//pub mod octant_storage_voxel_utils;
 pub mod voxel_trait;
+
+// utils
+pub mod octant_meta;
+pub mod octant_storage_utils;
+pub mod octant_storage_voxel_utils;
+
+// implementations
 pub mod voxels;
 pub mod octree_base;
 pub mod spatial_octree_base;
 pub mod morton_based_storage;
 
 
-
+// predefined and ready to use types
 use morton_based_storage::hashed_octant_storage::HashedOctantStorage;
 
 pub type Depth = u8;
