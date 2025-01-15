@@ -145,14 +145,14 @@ impl<Storage: ModifiableOctantStorage, Volumetric: Voxel>  SpatialOctreeBase<Sto
 	pub fn drill<F>(&mut self, octant_id: &Storage::OctantId, drill_func: F)  -> StorageResult<Storage::OctantId>
 	where F: FnMut(Depth, &Storage::OctantId, &Volumetric, &mut OctantStorageAccessorMut<Storage>) -> Option<AssignmentControlFlow<Storage::Data>> {
 		let voxel: Volumetric = self.get_voxel_by_id(octant_id).ok_or(StorageError::InvalidOctantId)?;
-		drill_from_storage(self.octants_mod(), octant_id, &voxel, drill_func)
+		drill_from_storage(self.octants_mut(), octant_id, &voxel, drill_func)
 	}
 
 	pub fn drill_from_root<F>(&mut self, drill_func: F)  -> StorageResult<Storage::OctantId>
 	where F: FnMut(Depth, &Storage::OctantId, &Volumetric, &mut OctantStorageAccessorMut<Storage>) -> Option<AssignmentControlFlow<Storage::Data>> {
 		let root_id: Storage::OctantId = self.get_root_id();
 		let voxel: Volumetric = self.get_root_voxel().clone();
-		drill_from_storage(self.octants_mod(), &root_id, &voxel, drill_func)
+		drill_from_storage(self.octants_mut(), &root_id, &voxel, drill_func)
 	}
 
 	pub fn subdivide_if<F, U>(&mut self, start_from_id: &Storage::OctantId, octant_voxel: &Volumetric, subdivide_predicate: F) -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
@@ -160,7 +160,7 @@ impl<Storage: ModifiableOctantStorage, Volumetric: Voxel>  SpatialOctreeBase<Sto
 		F: FnMut(Depth, &Storage::OctantId, &Volumetric, &mut OctantStorageAccessorMut<Storage>) -> SubdivisionControlFlow<U>,
 		U: FnMut(OctantPlacement) -> Storage::Data
 	{
-		subdivide_if_from_storage(self.octants_mod(), start_from_id, octant_voxel, subdivide_predicate)
+		subdivide_if_from_storage(self.octants_mut(), start_from_id, octant_voxel, subdivide_predicate)
 	}
 
 	pub fn subdivide_if_some<F, U>(&mut self, start_from_id: &Storage::OctantId, octant_voxel: &Volumetric, subdivide_predicate: F) -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
@@ -168,12 +168,9 @@ impl<Storage: ModifiableOctantStorage, Volumetric: Voxel>  SpatialOctreeBase<Sto
 		F: FnMut(Depth, &Storage::OctantId, &Volumetric, &mut OctantStorageAccessorMut<Storage>) -> SubdivisionControlFlow<U>,
 		U: FnMut(OctantPlacement) -> Option<Storage::Data>
 	{
-		subdivide_if_some_from_storage(self.octants_mod(), start_from_id, octant_voxel, subdivide_predicate)
+		subdivide_if_some_from_storage(self.octants_mut(), start_from_id, octant_voxel, subdivide_predicate)
 	}
 
-	pub fn octants_mod(&mut self) -> &mut Storage {
-		&mut self.base.octants
-	}
 }
 
 /// STATIC(non-constructors)
