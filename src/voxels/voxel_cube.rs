@@ -398,17 +398,13 @@ impl VolumetricCube {
 	const SPATIAL_POSITION: [Vec3A; OctantPlacement::OCTANTS_COUNT] = [
 		Vec3A::new(-1.0, -1.0, -1.0),// LOWER_BOTTOM_LEFT
 		Vec3A::new(-1.0, -1.0, 1.0), // LOWER_TOP_LEFT
+		Vec3A::new(-1.0, 1.0, -1.0), // UPPER_BOTTOM_LEFT
+		Vec3A::new(-1.0, 1.0, 1.0),  // UPPER_TOP_LEFT
+		
 		Vec3A::new(1.0,  -1.0, -1.0),// LOWER_BOTTOM_RIGHT
 		Vec3A::new(1.0,  -1.0, 1.0), // LOWER_TOP_RIGHT
-		
-		
-
-		Vec3A::new(-1.0, 1.0, 1.0),  // UPPER_TOP_LEFT
-		Vec3A::new(1.0,  1.0, 1.0),  // UPPER_TOP_RIGHT
 		Vec3A::new(1.0,  1.0, -1.0), // UPPER_BOTTOM_RIGHT
-		Vec3A::new(-1.0, 1.0, -1.0), // UPPER_BOTTOM_LEFT
-
-
+		Vec3A::new(1.0,  1.0, 1.0),  // UPPER_TOP_RIGHT
 	];
 	
 	const SPATIAL_NEIGHBOR_DIRECTION: [Vec3A; OctantNeighborDirection::FACING_NEIGHBOR_DIRECTIONS_COUNT] = [
