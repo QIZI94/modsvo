@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use super::octant_storage_trait::{ModifiableOctantStorage, OctantStorage, OctantStorageAccessorMut, StorageError, StorageResult};
 use super::octant_meta::Depth;
 use super::octant_meta::OctantPlacement;
@@ -117,6 +119,16 @@ impl<Storage: OctantStorage, Volumetric: Voxel>  SpatialOctreeBase<Storage, Volu
 	where F: FnMut(Depth, &Storage::OctantId, &Volumetric, &mut OctantStorageAccessorMut<Storage>) -> SearchControlFlow {
 		let root_id: Storage::OctantId = self.get_root_id();
 		self.breadth_first_search_mut(&root_id, search_func)
+	}
+
+	pub fn breadth_first_iterator(&self) -> BreadthFirstIterator<Storage, Volumetric> {
+		let root_voxel: Volumetric = self.get_root_voxel().clone();
+		BreadthFirstIterator::new(self.octants(), root_voxel)
+	}
+
+	pub fn breadth_first_iterator_mut(&mut self) -> BreadthFirstIteratorMut<Storage, Volumetric> {
+		let root_voxel: Volumetric = self.get_root_voxel().clone();
+		BreadthFirstIteratorMut::new(self.octants_mut(), root_voxel)
 	}
 }
 
@@ -393,4 +405,91 @@ fn compute_voxel_by_id_recursive<Storage: OctantStorage, Volumetric: Voxel>(
 	let child_voxel: Volumetric = parent_voxel.make_sub_voxel(child_placement);
 
 	child_voxel
+}
+
+
+pub struct BreadthFirstIterator<'a, Storage: OctantStorage, Volumetric: Voxel>{
+	to_be_visited: VecDeque<(Depth, Storage::OctantId, Volumetric)>,
+	octant_storage: &'a Storage,
+}
+
+impl<'a, Storage: OctantStorage, Volumetric: Voxel> BreadthFirstIterator<'a, Storage, Volumetric> {
+	pub fn new(octant_storage: &'a Storage, voxel: Volumetric) -> Self {
+		BreadthFirstIterator{
+			to_be_visited: VecDeque::from([(0, octant_storage.get_root_id(), voxel)]),
+			octant_storage: octant_storage
+		}
+	}
+}
+
+impl<'a, Storage: OctantStorage, Volumetric: Voxel> Iterator for BreadthFirstIterator<'a, Storage, Volumetric> {
+	type Item = (Depth, Storage::OctantId, Volumetric);
+	fn next(&mut self) -> Option<Self::Item> {
+		let octant_item: Option<(Depth, Storage::OctantId, Volumetric)> = self.to_be_visited.pop_front();
+
+		if let Some((depth, octant_id, voxel)) = &octant_item {
+			let child_depth = depth + 1;
+			self.octant_storage.get_existing_children(&octant_id).ok()?
+				.iter()
+				.zip(OctantPlacement::OCTANTS_ORDERED)
+				.filter_map(
+					|(&maybe_child_id, child_placement)|{
+						let child_id: Storage::OctantId = maybe_child_id?;
+						Some((child_id, child_placement))
+					}
+				)
+				.for_each(	
+					|(child_id, child_placement)|{
+						let child_voxel = voxel.make_sub_voxel(child_placement);
+						self.to_be_visited.push_back((child_depth, child_id, child_voxel));
+					}
+				);
+			}
+
+		octant_item
+	}
+}
+
+pub struct BreadthFirstIteratorMut<'a, Storage: OctantStorage, Volumetric: Voxel>{
+	to_be_visited: VecDeque<(Depth, Storage::OctantId, Volumetric)>,
+	storage_accessor: OctantStorageAccessorMut<'a, Storage> 
+}
+
+impl<'a, Storage: OctantStorage, Volumetric: Voxel> BreadthFirstIteratorMut<'a, Storage, Volumetric> {
+	pub fn new(octant_storage: &'a mut Storage, voxel: Volumetric) -> Self {
+		BreadthFirstIteratorMut{
+			to_be_visited: VecDeque::from([(0, octant_storage.get_root_id(), voxel)]),
+			storage_accessor: OctantStorageAccessorMut::<'a, Storage>::new( octant_storage)
+		}
+	}
+}	
+
+impl<'a, Storage: OctantStorage, Volumetric: Voxel> Iterator for BreadthFirstIteratorMut<'a, Storage, Volumetric> {
+	type Item = (Depth, Storage::OctantId, &'a mut OctantStorageAccessorMut::<'a, Storage>);
+	fn next(& mut self) -> Option<Self::Item>{
+		
+		let (depth, octant_id, voxel) = self.to_be_visited.pop_front()?;
+		let child_depth = depth + 1;
+		self.storage_accessor.get_existing_children(&octant_id).ok()?
+			.iter()
+			.zip(OctantPlacement::OCTANTS_ORDERED)
+			.filter_map(
+				|(&maybe_child_id, child_placement)|{
+					let child_id: Storage::OctantId = maybe_child_id?;
+					Some((child_id, child_placement))
+				}
+			)
+			.for_each(
+				|(child_id, child_placement)|{
+					let child_voxel = voxel.make_sub_voxel(child_placement);
+					self.to_be_visited.push_back((child_depth, child_id, child_voxel));
+				}
+			);
+
+		// when I'll understand lifetimes better I am going to do this without unsafe if possible,
+		// SAFETY: this is safe because lifetime of the iterator is the same as Item
+		let safe_accessor = unsafe {&mut *(&mut self.storage_accessor as *mut OctantStorageAccessorMut::<'a, Storage>)};
+			
+		Some((depth, octant_id, safe_accessor))
+	}
 }

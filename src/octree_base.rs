@@ -99,6 +99,10 @@ impl <Storage: OctantStorage> OctreeBase<Storage> {
 		BreadthFirstIterator::<Storage>::new(&self.octants)
 	}
 
+	pub fn breadth_first_iterator_mut(&mut self) -> BreadthFirstIteratorMut<Storage> {
+		BreadthFirstIteratorMut::<Storage>::new(&mut self.octants)
+	}
+
 }
 
 impl <Storage: ModifiableOctantStorage> OctreeBase<Storage> {
