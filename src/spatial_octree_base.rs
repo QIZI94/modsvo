@@ -28,14 +28,14 @@ impl<Storage: OctantStorage, Volumetric: Voxel>  SpatialOctreeBase<Storage, Volu
 	}
 	
 	pub fn octants(&self) -> &Storage {
-		&self.base.octants
+		self.base.octants()
 	}
 
 	pub fn octants_mut(&mut self) -> &mut Storage {
-		&mut self.base.octants
+		self.base.octants_mut()
 	}
 	pub fn get_root_id(&self) -> Storage::OctantId{
-		self.octants().get_root_id()
+		self.base.get_root_id()
 	}
 
 	pub fn get_root_voxel(&self) -> &Volumetric {

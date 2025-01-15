@@ -17,7 +17,7 @@ pub trait OctantIdTypeInfo {
 
 #[derive(Debug)]
 pub struct OctreeBase<Storage>{
-	pub octants: Storage,
+	pub octant_storage: Storage,
 }
 
 impl <Storage: OctantStorage> OctreeBase<Storage> {
@@ -25,82 +25,93 @@ impl <Storage: OctantStorage> OctreeBase<Storage> {
 	
 	pub fn new_with_storage(storage: Storage) -> Self{
 		OctreeBase{
-			octants: storage
+			octant_storage: storage
 		}
+	}
+
+	pub fn octants(&self) -> &Storage {
+		&self.octant_storage
+	}
+
+	pub fn octants_mut(&mut self) -> &mut Storage {
+		&mut self.octant_storage
+	}
+	pub fn get_root_id(&self) -> Storage::OctantId{
+		self.octant_storage.get_root_id()
 	}
 
 	pub fn guided_search<F>(&self, octant_id: &Storage::OctantId, guide_func: F)  -> StorageResult<Storage::OctantId>
 	where F: FnMut(Depth, &Storage::OctantId) -> Option<OctantPlacement> {
-		guided_search_from_storage(&self.octants, &octant_id, guide_func)
+		guided_search_from_storage(self.octants(), &octant_id, guide_func)
 	}
 
 	pub fn guided_search_from_root<F>(&self, guide_func: F)  -> StorageResult<Storage::OctantId>
 	where F: FnMut(Depth, &Storage::OctantId) -> Option<OctantPlacement> {
-		let root_id = self.octants.get_root_id();
+		let root_id = self.octants().get_root_id();
 		self.guided_search( &root_id, guide_func)
 	}
 
 	pub fn guided_search_mut<F>(&mut self, octant_id: &Storage::OctantId, guide_func: F)  -> StorageResult<Storage::OctantId>
 	where F: FnMut(Depth, &Storage::OctantId, &mut OctantStorageAccessorMut<Storage>) -> Option<OctantPlacement> {
-		guided_search_from_storage_mut(&mut self.octants, &octant_id, guide_func)
+		guided_search_from_storage_mut(self.octants_mut(), &octant_id, guide_func)
 	}
 
 	pub fn guided_search_from_root_mut<F>(&mut self, guide_func: F)  -> StorageResult<Storage::OctantId>
 	where F: FnMut(Depth, &Storage::OctantId, &mut OctantStorageAccessorMut<Storage>) -> Option<OctantPlacement> {
-		let root_id = self.octants.get_root_id();
+		let root_id = self.get_root_id();
 		self.guided_search_mut(&root_id, guide_func)
 	}
 
 	pub fn depth_first_search<F>(&self, octant_id: &Storage::OctantId, search_func: F)  -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
 	where F: FnMut(Depth, &Storage::OctantId) -> SearchControlFlow {
-		depth_first_search_from_storage(&self.octants, octant_id, search_func)
+		depth_first_search_from_storage(self.octants(), octant_id, search_func)
 	}
 
 	pub fn depth_first_search_from_root<F>(&self, search_func: F)  -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
 	where F: FnMut(Depth, &Storage::OctantId) -> SearchControlFlow {
-		let root_id = self.octants.get_root_id();
+		let root_id = self.get_root_id();
 		self.depth_first_search(&root_id, search_func)
 	}
 
 	pub fn depth_first_search_mut<F>(&mut self, octant_id: &Storage::OctantId, search_func: F)  -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
 	where F: FnMut(Depth, &Storage::OctantId, &mut OctantStorageAccessorMut<Storage>) -> SearchControlFlow {
-		depth_first_search_from_storage_mut(&mut self.octants, octant_id, search_func)
+		depth_first_search_from_storage_mut(self.octants_mut(), octant_id, search_func)
 	}
 
 	pub fn depth_first_search_from_root_mut<F>(&mut self, search_func: F)  -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
 	where F: FnMut(Depth, &Storage::OctantId, &mut OctantStorageAccessorMut<Storage>) -> SearchControlFlow {
-		let root_id = self.octants.get_root_id();
+		let root_id = self.get_root_id();
 		self.depth_first_search_mut(&root_id, search_func)
 	}
 
 	pub fn breadth_first_search<F>(&self, octant_id: &Storage::OctantId, search_func: F)  -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
 	where F: FnMut(Depth, &Storage::OctantId) -> SearchControlFlow {
-		breadth_first_search_from_storage(&self.octants, octant_id, search_func)
+		breadth_first_search_from_storage(self.octants(), octant_id, search_func)
 	}
 
 	pub fn breadth_first_search_from_root<F>(&self, search_func: F)  -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
 	where F: FnMut(Depth, &Storage::OctantId) -> SearchControlFlow {
-		let root_id = self.octants.get_root_id();
+		let root_id = self.octants().get_root_id();
 		self.breadth_first_search(&root_id, search_func)
 	}
 
 	pub fn breadth_first_search_mut<F>(&mut self, octant_id: &Storage::OctantId, search_func: F)  -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
 	where F: FnMut(Depth, &Storage::OctantId, &mut OctantStorageAccessorMut<Storage>) -> SearchControlFlow {
-		breadth_first_search_from_storage_mut(&mut self.octants, octant_id, search_func)
+		breadth_first_search_from_storage_mut(self.octants_mut(), octant_id, search_func)
 	}
 
 	pub fn breadth_first_search_from_root_mut<F>(&mut self, search_func: F)  -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
 	where F: FnMut(Depth, &Storage::OctantId, &mut OctantStorageAccessorMut<Storage>) -> SearchControlFlow {
-		let root_id = self.octants.get_root_id();
+		let root_id = self.get_root_id();
 		self.breadth_first_search_mut(&root_id, search_func)
 	}
 
 	pub fn breadth_first_iterator(&self) -> BreadthFirstIterator<Storage> {
-		BreadthFirstIterator::<Storage>::new(&self.octants)
+		BreadthFirstIterator::<Storage>::new(self.octants())
 	}
 
 	pub fn breadth_first_iterator_mut(&mut self) -> BreadthFirstIteratorMut<Storage> {
-		BreadthFirstIteratorMut::<Storage>::new(&mut self.octants)
+		BreadthFirstIteratorMut::<Storage>::new(self.octants_mut())
 	}
 
 }
@@ -113,12 +124,12 @@ impl <Storage: ModifiableOctantStorage> OctreeBase<Storage> {
 
 	pub fn drill<F>(&mut self, octant_id: &Storage::OctantId, drill_func: F)  -> StorageResult<Storage::OctantId>
 	where F: FnMut(Depth, &Storage::OctantId, &mut OctantStorageAccessorMut<Storage>) -> Option<AssignmentControlFlow<Storage::Data>> {
-		drill_from_storage(&mut self.octants, octant_id, drill_func)
+		drill_from_storage(self.octants_mut(), octant_id, drill_func)
 	}
 
 	pub fn drill_from_root<F>(&mut self, drill_func: F)  -> StorageResult<Storage::OctantId>
 	where F: FnMut(Depth, &Storage::OctantId, &mut OctantStorageAccessorMut<Storage>) -> Option<AssignmentControlFlow<Storage::Data>> {
-		let root_id = self.octants.get_root_id();
+		let root_id = self.get_root_id();
 		self.drill(&root_id, drill_func)
 	}
 
@@ -127,7 +138,7 @@ impl <Storage: ModifiableOctantStorage> OctreeBase<Storage> {
 		F: FnMut(Depth, &Storage::OctantId, &mut OctantStorageAccessorMut<Storage>) -> SubdivisionControlFlow<U>,
 		U: FnMut(OctantPlacement) -> Storage::Data
 	{
-		subdivide_if_from_storage(&mut self.octants, octant_id, subdivide_predicate)
+		subdivide_if_from_storage(self.octants_mut(), octant_id, subdivide_predicate)
 	}
 
 	pub fn subdivide_if_from_root<F, U>(&mut self, subdivide_predicate: F) -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
@@ -135,7 +146,7 @@ impl <Storage: ModifiableOctantStorage> OctreeBase<Storage> {
 		F: FnMut(Depth, &Storage::OctantId, &mut OctantStorageAccessorMut<Storage>) -> SubdivisionControlFlow<U>,
 		U: FnMut(OctantPlacement) -> Storage::Data
 	{
-		let root_id = self.octants.get_root_id();
+		let root_id = self.get_root_id();
 		self.subdivide_if( &root_id, subdivide_predicate)
 	}
 
@@ -144,7 +155,7 @@ impl <Storage: ModifiableOctantStorage> OctreeBase<Storage> {
 		F: FnMut(Depth, &Storage::OctantId, &mut OctantStorageAccessorMut<Storage>) -> SubdivisionControlFlow<U>,
 		U: FnMut(OctantPlacement) -> Option<Storage::Data>
 	{
-		subdivide_if_some_from_storage(&mut self.octants, octant_id, subdivide_predicate)
+		subdivide_if_some_from_storage(self.octants_mut(), octant_id, subdivide_predicate)
 	}
 
 	pub fn subdivide_if_some_from_root<F, U>(&mut self, subdivide_predicate: F) -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
@@ -152,7 +163,7 @@ impl <Storage: ModifiableOctantStorage> OctreeBase<Storage> {
 		F: FnMut(Depth, &Storage::OctantId, &mut OctantStorageAccessorMut<Storage>) -> SubdivisionControlFlow<U>,
 		U: FnMut(OctantPlacement) -> Option<Storage::Data>
 	{
-		let root_id = self.octants.get_root_id();
+		let root_id = self.get_root_id();
 		self.subdivide_if_some(&root_id, subdivide_predicate)
 	}
 
@@ -318,7 +329,7 @@ impl <Storage: OctantStorage> OctreeBase<Storage> {
 impl <Storage: OctantStorage + Default> Default for OctreeBase<Storage> {
 	fn default() -> Self {
 		OctreeBase{
-			octants: Storage::default()
+			octant_storage: Storage::default()
 		}
 	}
 }

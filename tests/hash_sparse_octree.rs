@@ -68,11 +68,11 @@ mod tests{
 
 
 
-		let level1 = octree.octants.subdivide_with_default(&MortonOctantId::ROOT_OCTANT_ID).unwrap()[1];
-		let level2 = octree.octants.subdivide_with_default(&level1).unwrap()[2];
-		let level3 = octree.octants.subdivide_with_default(&level2).unwrap()[7];
-		let level4 = octree.octants.subdivide_with_default(&level3).unwrap()[5];
-		octree.octants.subdivide_with_default(&level4).unwrap()[6];
+		let level1 = octree.octants_mut().subdivide_with_default(&MortonOctantId::ROOT_OCTANT_ID).unwrap()[1];
+		let level2 = octree.octants_mut().subdivide_with_default(&level1).unwrap()[2];
+		let level3 = octree.octants_mut().subdivide_with_default(&level2).unwrap()[7];
+		let level4 = octree.octants_mut().subdivide_with_default(&level3).unwrap()[5];
+		octree.octants_mut().subdivide_with_default(&level4).unwrap()[6];
 
 		// Test control-flow Break
 		let SearchControlFlowResult::Continue(continue_step_id) = octree.depth_first_search_from_root(
@@ -200,11 +200,11 @@ mod tests{
 
 
 
-		let level1 = octree.octants.subdivide_with_default(&MortonOctantId::ROOT_OCTANT_ID).unwrap()[1];
-		let level2 = octree.octants.subdivide_with_default(&level1).unwrap()[2];
-		let level3 = octree.octants.subdivide_with_default(&level2).unwrap()[7];
-		let level4 = octree.octants.subdivide_with_default(&level3).unwrap()[5];
-		octree.octants.subdivide_with_default(&level4).unwrap()[6];
+		let level1 = octree.octants_mut().subdivide_with_default(&MortonOctantId::ROOT_OCTANT_ID).unwrap()[1];
+		let level2 = octree.octants_mut().subdivide_with_default(&level1).unwrap()[2];
+		let level3 = octree.octants_mut().subdivide_with_default(&level2).unwrap()[7];
+		let level4 = octree.octants_mut().subdivide_with_default(&level3).unwrap()[5];
+		octree.octants_mut().subdivide_with_default(&level4).unwrap()[6];
 	
 		// Test control-flow Break
 		let SearchControlFlowResult::Continue(continue_step_id) = octree.depth_first_search_from_root_mut(
@@ -330,11 +330,11 @@ mod tests{
 		let mut breadth_first_visit_order_iter_all = breadth_first_visit_order.iter()
 			.map(|morton_code| *morton_code);
 
-		let level1 = octree.octants.subdivide_with_default(&MortonOctantId::ROOT_OCTANT_ID).unwrap()[1];
-		let level2 = octree.octants.subdivide_with_default(&level1).unwrap()[2];
-		let level3 = octree.octants.subdivide_with_default(&level2).unwrap()[7];
-		let level4 = octree.octants.subdivide_with_default(&level3).unwrap()[5];
-		octree.octants.subdivide_with_default(&level4).unwrap()[6];
+		let level1 = octree.octants_mut().subdivide_with_default(&MortonOctantId::ROOT_OCTANT_ID).unwrap()[1];
+		let level2 = octree.octants_mut().subdivide_with_default(&level1).unwrap()[2];
+		let level3 = octree.octants_mut().subdivide_with_default(&level2).unwrap()[7];
+		let level4 = octree.octants_mut().subdivide_with_default(&level3).unwrap()[5];
+		octree.octants_mut().subdivide_with_default(&level4).unwrap()[6];
 		// Test control-flow Break
 		let SearchControlFlowResult::Continue(continue_step_id) = octree.breadth_first_search_from_root(
 			|depth, octant_id: &MortonOctantId|{
@@ -457,11 +457,11 @@ mod tests{
 		let mut breadth_first_visit_order_iter_all = breadth_first_visit_order.iter()
 			.map(|morton_code| *morton_code);
 
-		let level1 = octree.octants.subdivide_with_default(&MortonOctantId::ROOT_OCTANT_ID).unwrap()[1];
-		let level2 = octree.octants.subdivide_with_default(&level1).unwrap()[2];
-		let level3 = octree.octants.subdivide_with_default(&level2).unwrap()[7];
-		let level4 = octree.octants.subdivide_with_default(&level3).unwrap()[5];
-		octree.octants.subdivide_with_default(&level4).unwrap()[6];
+		let level1 = octree.octants_mut().subdivide_with_default(&MortonOctantId::ROOT_OCTANT_ID).unwrap()[1];
+		let level2 = octree.octants_mut().subdivide_with_default(&level1).unwrap()[2];
+		let level3 = octree.octants_mut().subdivide_with_default(&level2).unwrap()[7];
+		let level4 = octree.octants_mut().subdivide_with_default(&level3).unwrap()[5];
+		octree.octants_mut().subdivide_with_default(&level4).unwrap()[6];
 		// Test control-flow Break
 		let SearchControlFlowResult::Continue(continue_step_id) = octree.breadth_first_search_from_root_mut(
 			|depth, octant_id: &MortonOctantId, _|{
@@ -537,12 +537,12 @@ mod tests{
 		type OctantId =  <SparseOctreeHashed<NoData> as OctantIdTypeInfo>::OctantId;
 		let mut octree: SparseOctreeHashed<NoData> = SparseOctreeHashed::default();
 
-		let l1 = octree.octants.subdivide_with_default(&MortonOctantId::ROOT_OCTANT_ID).unwrap()[2];
-		let level1 = octree.octants.subdivide_with_default(&MortonOctantId::ROOT_OCTANT_ID).unwrap()[1];
-		let level2 = octree.octants.subdivide_with_default(&level1).unwrap()[2];
-		let level3 = octree.octants.subdivide_with_default(&level2).unwrap()[7];
-		let level4 = octree.octants.subdivide_with_default(&level3).unwrap()[5];
-		octree.octants.subdivide_with_default(&level4).unwrap()[6];
+		let l1 = octree.octants_mut().subdivide_with_default(&MortonOctantId::ROOT_OCTANT_ID).unwrap()[2];
+		let level1 = octree.octants_mut().subdivide_with_default(&MortonOctantId::ROOT_OCTANT_ID).unwrap()[1];
+		let level2 = octree.octants_mut().subdivide_with_default(&level1).unwrap()[2];
+		let level3 = octree.octants_mut().subdivide_with_default(&level2).unwrap()[7];
+		let level4 = octree.octants_mut().subdivide_with_default(&level3).unwrap()[5];
+		octree.octants_mut().subdivide_with_default(&level4).unwrap()[6];
 
 		//octree = dbg!(octree);
 		
@@ -568,12 +568,12 @@ mod tests{
 		println!("\nLast id: {:?}", a.unwrap());
 		println!("count: {:?}", count);
 		dbg!(level4);
-		octree.octants.get_ancestors_for(&level4).unwrap().for_each(
+		octree.octants().get_ancestors_for(&level4).unwrap().for_each(
 			|octant_id|{
 				dbg!(octant_id);
 			}
 		);
-		let root_id: MortonOctantId = octree.octants.get_root_id();
+		let root_id: MortonOctantId = octree.octants().get_root_id();
 			octree.subdivide_if_some(
 			&root_id,
 			|depth, b, c|{
