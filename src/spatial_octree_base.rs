@@ -123,12 +123,13 @@ impl<Storage: OctantStorage, Volumetric: Voxel>  SpatialOctreeBase<Storage, Volu
 
 	pub fn breadth_first_iterator(&self) -> BreadthFirstIterator<Storage, Volumetric> {
 		let root_voxel: Volumetric = self.get_root_voxel().clone();
-		BreadthFirstIterator::new(self.octants(), root_voxel)
+		BreadthFirstIterator::new(self.octants(), self.get_root_id(), &root_voxel)
 	}
 
 	pub fn breadth_first_iterator_mut(&mut self) -> BreadthFirstIteratorMut<Storage, Volumetric> {
+		let root_id: Storage::OctantId = self.get_root_id();
 		let root_voxel: Volumetric = self.get_root_voxel().clone();
-		BreadthFirstIteratorMut::new(self.octants_mut(), root_voxel)
+		BreadthFirstIteratorMut::new(self.octants_mut(), root_id, &root_voxel)
 	}
 }
 
@@ -411,9 +412,12 @@ pub struct BreadthFirstIterator<'a, Storage: OctantStorage, Volumetric: Voxel>{
 }
 
 impl<'a, Storage: OctantStorage, Volumetric: Voxel> BreadthFirstIterator<'a, Storage, Volumetric> {
-	pub fn new(octant_storage: &'a Storage, voxel: Volumetric) -> Self {
+	pub fn new(octant_storage: &'a Storage, start_from_id: Storage::OctantId, root_voxel: &Volumetric) -> Self {
+		let depth: Depth = octant_storage.get_octant_depth(&start_from_id).expect("Cannot create iterator, id not found in octant-storage");
+		let voxel: Volumetric = compute_voxel_by_id(octant_storage, &start_from_id, root_voxel).unwrap();
+
 		BreadthFirstIterator{
-			to_be_visited: VecDeque::from([(0, octant_storage.get_root_id(), voxel)]),
+			to_be_visited: VecDeque::from([(depth, start_from_id, voxel)]),
 			octant_storage: octant_storage
 		}
 	}
@@ -435,7 +439,7 @@ impl<'a, Storage: OctantStorage, Volumetric: Voxel> Iterator for BreadthFirstIte
 						Some((child_id, child_placement))
 					}
 				)
-				.for_each(	
+				.for_each(
 					|(child_id, child_placement)|{
 						let child_voxel = voxel.make_sub_voxel(child_placement);
 						self.to_be_visited.push_back((child_depth, child_id, child_voxel));
@@ -453,12 +457,17 @@ pub struct BreadthFirstIteratorMut<'a, Storage: OctantStorage, Volumetric: Voxel
 }
 
 impl<'a, Storage: OctantStorage, Volumetric: Voxel> BreadthFirstIteratorMut<'a, Storage, Volumetric> {
-	pub fn new(octant_storage: &'a mut Storage, voxel: Volumetric) -> Self {
+	pub fn new(octant_storage: &'a mut Storage, start_from_id: Storage::OctantId, root_voxel: &Volumetric) -> Self {
+		let depth: Depth = octant_storage.get_octant_depth(&start_from_id).expect("Cannot create iterator, id not found in octant-storage");
+		let voxel: Volumetric = compute_voxel_by_id(octant_storage, &start_from_id, root_voxel).unwrap();
+
 		BreadthFirstIteratorMut{
-			to_be_visited: VecDeque::from([(0, octant_storage.get_root_id(), voxel)]),
+			to_be_visited: VecDeque::from([(depth, start_from_id, voxel)]),
 			storage_accessor: OctantStorageAccessorMut::<'a, Storage>::new( octant_storage)
 		}
 	}
+
+	
 }	
 
 impl<'a, Storage: OctantStorage, Volumetric: Voxel> Iterator for BreadthFirstIteratorMut<'a, Storage, Volumetric> {

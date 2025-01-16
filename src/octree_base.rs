@@ -107,11 +107,12 @@ impl <Storage: OctantStorage> OctreeBase<Storage> {
 	}
 
 	pub fn breadth_first_iterator(&self) -> BreadthFirstIterator<Storage> {
-		BreadthFirstIterator::<Storage>::new(self.octants())
+		BreadthFirstIterator::<Storage>::new(self.octants(), self.get_root_id())
 	}
 
 	pub fn breadth_first_iterator_mut(&mut self) -> BreadthFirstIteratorMut<Storage> {
-		BreadthFirstIteratorMut::<Storage>::new(self.octants_mut())
+		let root_id: Storage::OctantId = self.get_root_id();
+		BreadthFirstIteratorMut::<Storage>::new(self.octants_mut(), root_id)
 	}
 
 }
@@ -345,9 +346,11 @@ pub struct BreadthFirstIterator<'a, Storage: OctantStorage>{
 }
 
 impl<'a, Storage: OctantStorage> BreadthFirstIterator<'a, Storage> {
-	pub fn new(octant_storage: &'a Storage) -> Self {
+	pub fn new(octant_storage: &'a Storage, start_from_id: Storage::OctantId) -> Self {
+		let depth: Depth = octant_storage.get_octant_depth(&start_from_id).expect("Cannot create iterator, id not found in octant-storage");
+		
 		BreadthFirstIterator{
-			to_be_visited: VecDeque::from([(0, octant_storage.get_root_id())]),
+			to_be_visited: VecDeque::from([(depth, start_from_id)]),
 			octant_storage: octant_storage
 		}
 	}
@@ -380,9 +383,11 @@ pub struct BreadthFirstIteratorMut<'a, Storage: OctantStorage>{
 }
 
 impl<'a, Storage: OctantStorage> BreadthFirstIteratorMut<'a, Storage> {
-	pub fn new(octant_storage: &'a mut Storage) -> Self {
+	pub fn new(octant_storage: &'a mut Storage, start_from_id: Storage::OctantId) -> Self {
+		let depth: Depth = octant_storage.get_octant_depth(&start_from_id).expect("Cannot create iterator, id not found in octant-storage");
+
 		BreadthFirstIteratorMut{
-			to_be_visited: VecDeque::from([(0, octant_storage.get_root_id())]),
+			to_be_visited: VecDeque::from([(depth, start_from_id)]),
 			storage_accessor: OctantStorageAccessorMut::<'a, Storage>::new( octant_storage)
 		}
 	}
