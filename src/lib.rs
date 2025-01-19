@@ -18,8 +18,10 @@ pub mod morton_based_storage;
 use morton_based_storage::hashed_octant_storage::HashedOctantStorage;
 
 pub type SparseOctreeHashed<CustomData> = octree_base::OctreeBase<HashedOctantStorage<CustomData>>;
-pub type SpatialSparseOctreeHashed<CustomData> = spatial_octree_base::SpatialOctreeBase<HashedOctantStorage<CustomData>>;
+pub type SpatialSparseOctreeHashed<CustomData, Volumetric = voxels::voxel_cube::VolumetricCube>
+	 = spatial_octree_base::SpatialOctreeBase<HashedOctantStorage<CustomData>, Volumetric>;
 
 // default option
 pub type SparseOctree<CustomData> = SparseOctreeHashed<CustomData>;
-pub type SpatialSparseOctree<CustomData> = SpatialSparseOctreeHashed<CustomData>;
+pub type SpatialSparseOctree<CustomData, Volumetric = voxels::voxel_cube::VolumetricCube>
+	 = SpatialSparseOctreeHashed<CustomData, Volumetric>;
