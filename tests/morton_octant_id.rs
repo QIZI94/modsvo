@@ -145,4 +145,21 @@ mod tests{
 		}
 	}
 
+	#[test]
+	fn test_longest_common_ancestor(){
+		let root_id: MortonOctantId = MortonOctantId::ROOT_OCTANT_ID;
+		let first_children = root_id.children_ids();
+		let second_child = first_children[3].children_ids()[3].children_ids()[4].children_ids()[6];
+
+		let forth_child = second_child.children_ids()[3];
+		let sixth_child = second_child.children_ids()[5];
+
+		let eighth_child = sixth_child.children_ids()[0];
+		let tenth_child = forth_child.children_ids()[6];
+
+		let result = eighth_child.nearest_common_ancestor_with(tenth_child);
+		assert_eq!(result, second_child);
+
+	}
+
 }

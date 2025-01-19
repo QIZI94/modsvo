@@ -71,6 +71,12 @@ impl MortonOctantId {
 		depth_from_morton_code(self.as_morton())
 	}
 
+	pub fn nearest_common_ancestor_with(&self, other: MortonOctantId) -> MortonOctantId {
+		MortonOctantId(
+			nearest_common_ancestor(self.0, other.0)
+		)
+	}
+
 	pub fn get_neighbor(&self, neighbor_direction: OctantNeighborDirection) -> Result<MortonOctantId, ValidationError> {
 		let depth: Depth = self.compute_depth();
 		let [x, y, z] = self.xyz().map(i32::from);
@@ -442,4 +448,21 @@ pub fn children_ids_from_parent_id(parent_morton: u64) -> [MortonOctantId; Octan
 		MortonOctantId(child_offset | 6),
 		MortonOctantId(child_offset | 7),
 	]
+}
+
+pub fn nearest_common_ancestor(mut morton_code_a: u64, mut morton_code_b: u64) -> u64 {
+	let initial_shift = (morton_code_a.leading_zeros() as i64 - morton_code_b.leading_zeros() as i64).abs();
+	if morton_code_a > morton_code_b{
+		morton_code_a >>= initial_shift;
+	}
+	else {
+		morton_code_b >>= initial_shift;
+	}
+
+	while morton_code_a != morton_code_b {
+		morton_code_a >>= 3;
+		morton_code_b >>= 3;
+	}
+
+	morton_code_a
 }
