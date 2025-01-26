@@ -67,6 +67,19 @@ impl MortonOctantId {
 		MortonOctantId(child_offset | octant_placement_index as u64)
 	}
 
+	pub fn child_placement_by_id(&self, child_octant_id: MortonOctantId) -> Option<OctantPlacement>{
+		if child_octant_id.is_valid() && *self == child_octant_id.parent_id(){
+			const MORTON_OCTANT_ID_BITS_MASK: u64 = 0x7;
+			let child_morton = child_octant_id.as_morton();
+			let placement_index = MORTON_OCTANT_ID_BITS_MASK & child_morton;
+
+			Some(OctantPlacement::OCTANTS_ORDERED[placement_index as usize])
+		}
+		else {
+			None
+		}
+	}
+
 	pub fn compute_depth(&self) -> Depth {
 		depth_from_morton_code(self.as_morton())
 	}
