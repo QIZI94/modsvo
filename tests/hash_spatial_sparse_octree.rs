@@ -75,7 +75,7 @@ mod tests{
 
 		// Test control-flow Break
 		let SearchControlFlowResult::Continue(continue_step_id) = octree.depth_first_search_from_root(
-			&mut |depth, octant_id: &MortonOctantId, octant_voxel|{
+			|depth, octant_id: &MortonOctantId, octant_voxel|{
 				let correct_morton_code = depth_first_visit_order_iter_all.next().expect("Depth first search visited more octants than defined.");
 				assert_eq!(octant_id.as_morton(), correct_morton_code, "Depth first search visited octant with morton code different from defined.");
 				assert_eq!(octant_id.compute_depth() as u8, depth);
@@ -95,7 +95,7 @@ mod tests{
 			.map(|(_, morton_code)| *morton_code);
 
 		let SearchControlFlowResult::Break(break_step_id) = octree.depth_first_search_from_root(
-			&mut |depth, octant_id, octant_voxel|{
+			|depth, octant_id, octant_voxel|{
 				let correct_morton_code = depth_first_visit_order_iter_break.next().expect("Depth first search visited more octants than defined.");
 				assert_eq!(octant_id.as_morton(), correct_morton_code, "Depth first search visited octant with morton code different from defined.");
 				assert_eq!(octant_id.compute_depth() as u8, depth);
@@ -129,7 +129,7 @@ mod tests{
 
 		let mut continue_skipping: bool = false;
 		let SearchControlFlowResult::Skip(skip_step_id) = octree.depth_first_search_from_root(
-			&mut |depth, octant_id, octant_voxel|{
+			|depth, octant_id, octant_voxel|{
 				let correct_morton_code = depth_first_visit_order_iter_skip.next().expect("Depth first search visited more octants than defined.");
 				assert_eq!(octant_id.as_morton(), correct_morton_code, "Depth first search visited octant with morton code different from defined.");
 				assert_eq!(octant_id.compute_depth() as u8, depth);
@@ -211,7 +211,7 @@ mod tests{
 	
 		// Test control-flow Break
 		let SearchControlFlowResult::Continue(continue_step_id) = octree.depth_first_search_from_root_mut(
-			&mut |depth, octant_id: &MortonOctantId, octant_voxel, _|{
+			|depth, octant_id: &MortonOctantId, octant_voxel, _|{
 				let correct_morton_code = depth_first_visit_order_iter_all.next().expect("Depth first search visited more octants than defined.");
 				assert_eq!(octant_id.as_morton(), correct_morton_code, "Depth first search visited octant with morton code different from defined.");
 				assert_eq!(octant_id.compute_depth() as u8, depth);
@@ -231,7 +231,7 @@ mod tests{
 			.map(|(_, morton_code)| *morton_code);
 
 		let SearchControlFlowResult::Break(break_step_id) = octree.depth_first_search_from_root_mut(
-			&mut |depth, octant_id, octant_voxel, _|{
+			|depth, octant_id, octant_voxel, _|{
 				let correct_morton_code = depth_first_visit_order_iter_break.next().expect("Depth first search visited more octants than defined.");
 				assert_eq!(octant_id.as_morton(), correct_morton_code, "Depth first search visited octant with morton code different from defined.");
 				assert_eq!(octant_id.compute_depth() as u8, depth);
@@ -265,7 +265,7 @@ mod tests{
 
 		let mut continue_skipping: bool = false;
 		let SearchControlFlowResult::Skip(skip_step_id) = octree.depth_first_search_from_root_mut(
-			&mut |depth, octant_id, octant_voxel, _|{
+			|depth, octant_id, octant_voxel, _|{
 				let correct_morton_code = depth_first_visit_order_iter_skip.next().expect("Depth first search visited more octants than defined.");
 				assert_eq!(octant_id.as_morton(), correct_morton_code, "Depth first search visited octant with morton code different from defined.");
 				assert_eq!(octant_id.compute_depth() as u8, depth);
@@ -344,7 +344,7 @@ mod tests{
 		octree.octants_mut().subdivide_with_default(&level4).unwrap()[6];
 		// Test control-flow Break
 		let SearchControlFlowResult::Continue(continue_step_id) = octree.breadth_first_search_from_root(
-			&mut |depth, octant_id, octant_voxel|{
+			|depth, octant_id, octant_voxel|{
 				let correct_morton_code = breadth_first_visit_order_iter_all.next().expect("Depth first search visited more octants than defined.");
 				assert_eq!(octant_id.as_morton(), correct_morton_code, "Depth first search visited octant with morton code different from defined.");
 				assert_eq!(octant_id.compute_depth() as u8, depth);
@@ -364,7 +364,7 @@ mod tests{
 			.map(|(_, morton_code)| *morton_code);
 
 		let SearchControlFlowResult::Break(break_step_id) = octree.breadth_first_search_from_root(
-			&mut |depth, octant_id, octant_voxel|{
+			|depth, octant_id, octant_voxel|{
 				let correct_morton_code = breadth_first_visit_order_iter_break.next().expect("Depth first search visited more octants than defined.");
 				assert_eq!(octant_id.as_morton(), correct_morton_code, "Depth first search visited octant with morton code different from defined.");
 				assert_eq!(octant_id.compute_depth() as u8, depth);
@@ -397,7 +397,7 @@ mod tests{
 			.unwrap();
 
 		let SearchControlFlowResult::Skip(skip_step_id) = octree.breadth_first_search_from_root(
-			&mut |depth, octant_id, octant_voxel|{
+			|depth, octant_id, octant_voxel|{
 				let correct_morton_code = breadth_first_visit_order_iter_skip.next().expect("Depth first search visited more octants than defined.");
 				assert_eq!(octant_id.as_morton(), correct_morton_code, "Depth first search visited octant with morton code different from defined.");
 				assert_eq!(octant_id.compute_depth() as u8, depth);
@@ -606,7 +606,7 @@ mod tests{
 
 		let mut collapse_octants_remaining_it = collapse_octants_remaining.iter();
 		octree.depth_first_search_from_root(
-			&mut |_depth, octant_id: &MortonOctantId, _|{
+			|_depth, octant_id: &MortonOctantId, _|{
 				let expected_octant_id = *collapse_octants_remaining_it.next().expect("Wrong order after octant collapse");
 				assert_eq!(expected_octant_id, octant_id.as_morton());
 

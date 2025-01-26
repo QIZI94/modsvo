@@ -72,38 +72,38 @@ impl<Storage: OctantStorage, Volumetric: Voxel>  SpatialOctreeBase<Storage, Volu
 		guided_search_from_storage_mut(self.octants_mut(), &root_id, &voxel, guided_fn)
 	}
 
-	pub fn depth_first_search<F>(&self, octant_id: &Storage::OctantId, search_func: &mut F)  -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
+	pub fn depth_first_search<F>(&self, octant_id: &Storage::OctantId, search_func: F)  -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
 	where F: FnMut(Depth, &Storage::OctantId, &Volumetric) -> SearchControlFlow {
 		let voxel: Volumetric = self.get_voxel_by_id(octant_id).ok_or(StorageError::InvalidOctantId)?;
 		depth_first_search_from_storage(self.octants(), octant_id, &voxel, search_func)
 	}
 
-	pub fn depth_first_search_from_root<F>(&self, search_func: &mut F)  -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
+	pub fn depth_first_search_from_root<F>(&self, search_func: F)  -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
 	where F: FnMut(Depth, &Storage::OctantId, &Volumetric) -> SearchControlFlow {
 		let root_id = self.get_root_id();
 		self.depth_first_search(&root_id, search_func)
 	}
 
-	pub fn depth_first_search_mut<F>(&mut self, octant_id: &Storage::OctantId, search_func: &mut F)  -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
+	pub fn depth_first_search_mut<F>(&mut self, octant_id: &Storage::OctantId, search_func: F)  -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
 	where F: FnMut(Depth, &Storage::OctantId, &Volumetric, &mut OctantStorageAccessorMut<Storage>) -> SearchControlFlow {
 		let voxel: Volumetric = self.get_voxel_by_id(octant_id).ok_or(StorageError::InvalidOctantId)?;
 		depth_first_search_from_storage_mut(self.octants_mut(), octant_id, &voxel, search_func)
 	}
 
-	pub fn depth_first_search_from_root_mut<F>(&mut self, search_func: &mut F)  -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
+	pub fn depth_first_search_from_root_mut<F>(&mut self, search_func: F)  -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
 	where F: FnMut(Depth, &Storage::OctantId, &Volumetric, &mut OctantStorageAccessorMut<Storage>) -> SearchControlFlow {
 		let root_id: Storage::OctantId = self.get_root_id();
 		self.depth_first_search_mut(&root_id, search_func)
 	}
 
 
-	pub fn breadth_first_search<F>(&self, octant_id: &Storage::OctantId, search_func: &mut F)  -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
+	pub fn breadth_first_search<F>(&self, octant_id: &Storage::OctantId, search_func: F)  -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
 	where F: FnMut(Depth, &Storage::OctantId, &Volumetric) -> SearchControlFlow {
 		let voxel: Volumetric = self.get_voxel_by_id(octant_id).ok_or(StorageError::InvalidOctantId)?;
 		breadth_first_search_from_storage(self.octants(), octant_id, &voxel, search_func)
 	}
 
-	pub fn breadth_first_search_from_root<F>(&self, search_func: &mut F)  -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
+	pub fn breadth_first_search_from_root<F>(&self, search_func: F)  -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
 	where F: FnMut(Depth, &Storage::OctantId, &Volumetric) -> SearchControlFlow {
 		let root_id: Storage::OctantId = self.get_root_id();
 		self.breadth_first_search(&root_id, search_func)
