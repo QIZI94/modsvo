@@ -9,7 +9,7 @@ mod tests{
 	
 	
 
-    use modsvo::{octant_meta::OctantPlacement,octant_storage_trait::{OctantStorage, ModifiableOctantStorage}, octree_base::{SearchControlFlow, SearchControlFlowResult, SubdivisionControlFlow}, voxels::voxel_cube::VolumetricCube, octant_meta::Depth, SparseOctreeHashed};
+    use modsvo::{octant_meta::OctantPlacement,octant_storage_trait::{OctantStorage, ModifiableOctantStorage}, octree_base::{SearchControlFlow, SearchControlFlowResult, SubdivisionControlFlow}, octant_meta::Depth, SparseOctreeHashed};
 
 	use modsvo::morton_based_storage::morton_octant_id::MortonOctantId;
 	use modsvo::octree_base::OctantIdTypeInfo;
@@ -530,6 +530,296 @@ mod tests{
 			panic!("Wrong last step.");
 		};
 		assert_eq!(skip_step_id.as_morton(), breadth_first_last_visit);
+	}
+
+	#[test]
+	fn test_collapse_octants() {
+		let mut octree: SparseOctreeHashed<NoData> = SparseOctreeHashed::default();
+
+		// #### TEST 1 #### //
+		let collapse_octants_remaining = [
+			1_u64,
+			8,
+			9,
+			10,
+			11,
+			12,
+			13,
+			14,
+			15,
+			120,
+			122,
+			123,
+			124,
+			125,
+			126,
+			127,
+			1017,
+			1018,
+			1019,
+			1020,
+			1021,
+			1022,
+			1023	
+		];
+
+		
+
+		octree.subdivide_if_some_from_root(
+			|depth, _, _|{
+				if depth >= 3 {
+					SubdivisionControlFlow::Skip
+				}
+				else {
+					SubdivisionControlFlow::Continue(move |_: OctantPlacement| Some(NoData))
+				}
+			}
+		).unwrap();
+
+		octree.octants_mut().remove_octant(&MortonOctantId(1016)).expect("Couldn't remove");
+		octree.octants_mut().remove_octant(&MortonOctantId(121)).expect("Couldn't remove");
+
+		octree.collapse_octants_from_root(
+			|_depth, octant_id, storage_accessor|{
+				//let octant_id_raw = octant_id.0;
+				//println!("{}", octant_id_raw);
+				!storage_accessor.get_existing_children(octant_id).unwrap()
+					.into_iter()
+					.any(|maybe_child: Option<MortonOctantId>| maybe_child.is_some())
+			},
+			|_,_,_| true
+		).unwrap();
+
+		let mut collapse_octants_remaining_it = collapse_octants_remaining.iter();
+		octree.depth_first_search_from_root(
+			|_depth, octant_id: &MortonOctantId|{
+				let expected_octant_id = *collapse_octants_remaining_it.next().expect("Wrong order after octant collapse");
+				assert_eq!(expected_octant_id, octant_id.as_morton());
+
+				SearchControlFlow::Continue
+			}
+		).unwrap();
+
+		assert_eq!(collapse_octants_remaining.len(), octree.octants().iter().count());
+
+		// #### TEST 2 #### //
+
+	}
+
+	#[test]
+	fn test_collapse_specific_octants() {
+		let mut octree: SparseOctreeHashed<NoData> = SparseOctreeHashed::default();
+
+		let collapse_specific_octants_remaining = [
+			8_u64,
+			64,
+			513,
+			514,
+			515,
+			516,
+			517,
+			518,
+			519,
+			65,
+			521,
+			522,
+			523,
+			524,
+			525,
+			526,
+			527,
+			66,
+			529,
+			530,
+			531,
+			532,
+			533,
+			534,
+			535,
+			67,
+			537,
+			538,
+			539,
+			540,
+			541,
+			542,
+			543,
+			68,
+			545,
+			546,
+			547,
+			548,
+			549,
+			550,
+			551,
+			69,
+			553,
+			554,
+			555,
+			556,
+			557,
+			558,
+			559,
+			70,
+			561,
+			562,
+			563,
+			564,
+			565,
+			566,
+			567,
+			71,
+			569,
+			570,
+			571,
+			572,
+			573,
+			574,
+			575,
+			9,
+			72,
+			577,
+			578,
+			579,
+			580,
+			581,
+			582,
+			583,
+			73,
+			585,
+			586,
+			587,
+			588,
+			589,
+			590,
+			591,
+			74,
+			75,
+			76,
+			77,
+			78,
+			79,
+			10
+		];
+
+		const EXPECTED_OCTANT_COUNT: usize = 455;
+		
+
+
+		let mut ids_to_start_from: [Option<MortonOctantId>; 3] = [
+			None,
+			None,
+			None
+		];
+
+		let mut ids_to_remove: [Option<MortonOctantId>; 10] = [
+			None,
+			None,
+			None,
+			None,
+			None,
+			None,
+			None,
+			None,
+			None,
+			None,
+		];
+
+		
+
+		octree.subdivide_if_some_from_root(
+			|depth, octant_id , _|{
+				if depth == 1{
+					let maybe_free_slot = ids_to_start_from.iter_mut().find(|high_level_id|  high_level_id.is_none());
+					if let Some(free_slot) = maybe_free_slot {
+						*free_slot = Some(*octant_id)
+					}
+				}
+
+				if depth >= 3 {
+					let maybe_free_slot = ids_to_remove.iter()
+						.enumerate()
+						.filter(
+							|_|{
+								ids_to_remove.iter()
+									.all(
+										|maybe_free_slot|{
+											maybe_free_slot.is_none_or(
+												|free_slot|{
+													free_slot.parent_id().ne(&octant_id.parent_id())
+												}
+											)
+											
+										}
+									)
+							}
+						)
+						.find(
+							|(_, high_level_id)|{
+								high_level_id.is_none()
+							}
+						);
+					if let Some((free_slot_index, _)) = maybe_free_slot {
+						ids_to_remove[free_slot_index] = Some(*octant_id)
+					}
+					SubdivisionControlFlow::Skip
+				}
+				else {
+					SubdivisionControlFlow::Continue(move |_: OctantPlacement| Some(NoData))
+				}
+			}
+		).unwrap();
+		
+		
+		ids_to_remove.iter()
+			.flatten()
+			.for_each(
+				|id|{
+					octree.octants_mut().remove_octant(id).unwrap();
+				}
+			);
+		
+		ids_to_start_from.iter()
+			.flatten()
+			.for_each(
+				|id|{
+					octree.collapse_octants(
+						id,
+						|_,octant_id, storage_accessor,|{
+							!storage_accessor.get_existing_children(octant_id).unwrap()
+								.into_iter()
+								.any(|maybe_child: Option<MortonOctantId>| maybe_child.is_some())
+
+						},
+						|_,_,_| true
+					).unwrap();
+				}
+			);
+
+		let mut collapse_specific_octants_remaining_it = collapse_specific_octants_remaining.iter();
+		let mut expected_octant_count: usize = 0;
+		octree.depth_first_search_from_root(
+			|_depth, octant_id: &MortonOctantId|{
+				let shares_parent = ids_to_start_from.iter()
+					.flatten()
+					.any(
+						|high_level_parent|{
+							high_level_parent.nearest_common_ancestor_with(*octant_id) == *high_level_parent
+						}
+					);
+				
+				if shares_parent {				
+					let expected_octant_id = *collapse_specific_octants_remaining_it.next().expect("Wrong order after octant collapse");
+					assert_eq!(expected_octant_id, octant_id.as_morton());
+					//println!("{:?},", octant_id.as_morton());
+					expected_octant_count += 1;
+				}
+				SearchControlFlow::Continue
+			}
+		).unwrap();
+
+		assert_eq!(expected_octant_count, collapse_specific_octants_remaining.len());
+		assert_eq!(EXPECTED_OCTANT_COUNT, octree.octants().iter().count());
 	}
 
 	#[test]

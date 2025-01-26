@@ -440,3 +440,64 @@ where
 	last_visited_step.ok_or(StorageError::InvalidOctantId)
 }
 
+
+pub fn collapse_octants_from_storage<Storage, F, L>(storage: &mut Storage, start_from_id: &Storage::OctantId, mut is_leaf_predicate: F, mut make_leaf: L)  -> StorageResult<bool>
+where 
+	Storage: ModifiableOctantStorage,
+	F: FnMut(Depth, &Storage::OctantId, &mut OctantStorageAccessorMut<Storage>) -> bool,
+	L: FnMut(Depth, &Storage::OctantId, &mut OctantStorageAccessorMut<Storage>) -> bool { 
+
+	let start_from_depth = storage.get_octant_depth(start_from_id).ok_or(StorageError::InvalidOctantId)?;
+	collapse_octants_recursive(storage, start_from_depth, start_from_id, &mut is_leaf_predicate, &mut make_leaf)
+}
+
+fn collapse_octants_recursive<Storage: OctantStorage, F, L>(storage: &mut Storage, current_depth: Depth, octant_id: &Storage::OctantId, is_leaf_predicate: &mut F, make_leaf: &mut L)  -> StorageResult<bool>
+where
+	Storage: ModifiableOctantStorage,
+	F: FnMut(Depth, &Storage::OctantId, &mut OctantStorageAccessorMut<Storage>) -> bool,
+	L: FnMut(Depth, &Storage::OctantId, &mut OctantStorageAccessorMut<Storage>) -> bool	{
+
+	// Iterate over all possible children of the current node
+	let children_ids = storage.get_existing_children(octant_id)?;
+
+	let children_depth: Depth = current_depth + 1;
+	let mut all_children_are_leaves: bool = true;
+	for maybe_child_id in children_ids.iter(){
+		if let Some(child_id) = maybe_child_id{
+			let mut storage_accessor = OctantStorageAccessorMut::<Storage>::new(storage);
+			let is_leaf: bool = is_leaf_predicate(children_depth, &child_id, &mut storage_accessor);
+
+			if !is_leaf {
+				let child_of_child_is_leaf: bool = collapse_octants_recursive(storage, children_depth, child_id, is_leaf_predicate, make_leaf)?;
+				if !child_of_child_is_leaf{
+					all_children_are_leaves = false;
+				}
+			}
+		}
+		else {
+			all_children_are_leaves = false;
+		}
+	}
+
+	if all_children_are_leaves {
+		let mut storage_accessor = OctantStorageAccessorMut::<Storage>::new(storage);
+		//println!("Here {:?}", *octant_id);
+		let remove_children: bool = make_leaf(current_depth, octant_id, &mut storage_accessor);
+		
+		if remove_children{
+			children_ids.iter()
+				.flatten()
+				.for_each(
+					|child_id|{
+						let _ = storage.remove_octant(child_id)
+							.expect("Broken children link.");
+					}
+				);
+		}
+		
+		Ok(true)
+	}
+	else {
+		Ok(false) // This node cannot be collapsed
+	}
+}

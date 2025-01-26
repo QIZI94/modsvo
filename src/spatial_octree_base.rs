@@ -164,12 +164,50 @@ impl<Storage: ModifiableOctantStorage, Volumetric: Voxel>  SpatialOctreeBase<Sto
 		subdivide_if_from_storage(self.octants_mut(), start_from_id, octant_voxel, subdivide_predicate)
 	}
 
+	pub fn subdivide_if_from_root<F, U>(&mut self, subdivide_predicate: F) -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
+	where
+		F: FnMut(Depth, &Storage::OctantId, &Volumetric, &mut OctantStorageAccessorMut<Storage>) -> SubdivisionControlFlow<U>,
+		U: FnMut(OctantPlacement) -> Storage::Data
+	{
+		let root_id: Storage::OctantId = self.get_root_id();
+		let root_voxel: Volumetric = self.get_root_voxel().clone();
+		subdivide_if_from_storage(self.octants_mut(), &root_id, &root_voxel, subdivide_predicate)
+	}
+
 	pub fn subdivide_if_some<F, U>(&mut self, start_from_id: &Storage::OctantId, octant_voxel: &Volumetric, subdivide_predicate: F) -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
 	where
 		F: FnMut(Depth, &Storage::OctantId, &Volumetric, &mut OctantStorageAccessorMut<Storage>) -> SubdivisionControlFlow<U>,
 		U: FnMut(OctantPlacement) -> Option<Storage::Data>
 	{
 		subdivide_if_some_from_storage(self.octants_mut(), start_from_id, octant_voxel, subdivide_predicate)
+	}
+
+	pub fn subdivide_if_some_from_root<F, U>(&mut self, subdivide_predicate: F) -> StorageResult<SearchControlFlowResult<Storage::OctantId>>
+	where
+		F: FnMut(Depth, &Storage::OctantId, &Volumetric, &mut OctantStorageAccessorMut<Storage>) -> SubdivisionControlFlow<U>,
+		U: FnMut(OctantPlacement) -> Option<Storage::Data>
+	{
+		let root_id: Storage::OctantId = self.get_root_id();
+		let root_voxel: Volumetric = self.get_root_voxel().clone();
+		subdivide_if_some_from_storage(self.octants_mut(), &root_id, &root_voxel, subdivide_predicate)
+	}
+
+	pub fn collapse_octants<F, L>(&mut self, start_from_id: &Storage::OctantId, octant_voxel: &Volumetric, is_leaf_predicate: F, make_leaf: L)  -> StorageResult<bool>
+	where 
+		F: FnMut(Depth, &Storage::OctantId, &Volumetric, &mut OctantStorageAccessorMut<Storage>) -> bool,
+		L: FnMut(Depth, &Storage::OctantId, &Volumetric, &mut OctantStorageAccessorMut<Storage>) -> bool 
+	{
+		collapse_octants_from_storage(self.octants_mut(), start_from_id, octant_voxel, is_leaf_predicate, make_leaf)
+	}
+
+	pub fn collapse_octants_from_root<F, L>(&mut self, is_leaf_predicate: F, make_leaf: L)  -> StorageResult<bool>
+	where 
+		F: FnMut(Depth, &Storage::OctantId, &Volumetric, &mut OctantStorageAccessorMut<Storage>) -> bool,
+		L: FnMut(Depth, &Storage::OctantId, &Volumetric, &mut OctantStorageAccessorMut<Storage>) -> bool 
+	{
+		let root_id = self.get_root_id();
+		let root_voxel = self.get_root_voxel().clone();
+		collapse_octants_from_storage(self.octants_mut(), &root_id, &root_voxel, is_leaf_predicate, make_leaf)
 	}
 
 }

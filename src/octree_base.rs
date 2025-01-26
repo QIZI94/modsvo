@@ -168,7 +168,22 @@ impl <Storage: ModifiableOctantStorage> OctreeBase<Storage> {
 		self.subdivide_if_some(&root_id, subdivide_predicate)
 	}
 
-	
+	pub fn collapse_octants<F, L>(&mut self, start_from_id: &Storage::OctantId, is_leaf_predicate: F, make_leaf: L)  -> StorageResult<bool>
+	where 
+		F: FnMut(Depth, &Storage::OctantId, &mut OctantStorageAccessorMut<Storage>) -> bool,
+		L: FnMut(Depth, &Storage::OctantId, &mut OctantStorageAccessorMut<Storage>) -> bool 
+	{
+		collapse_octants_from_storage(self.octants_mut(), start_from_id, is_leaf_predicate, make_leaf)
+	}
+
+	pub fn collapse_octants_from_root<F, L>(&mut self, is_leaf_predicate: F, make_leaf: L)  -> StorageResult<bool>
+	where 
+		F: FnMut(Depth, &Storage::OctantId, &mut OctantStorageAccessorMut<Storage>) -> bool,
+		L: FnMut(Depth, &Storage::OctantId, &mut OctantStorageAccessorMut<Storage>) -> bool 
+	{
+		let root_id = self.get_root_id();
+		collapse_octants_from_storage(self.octants_mut(), &root_id, is_leaf_predicate, make_leaf)
+	}	
 }
 
 /// STATIC(non-constructors), these are not internally used but are for convenience when working with mutable accessors
