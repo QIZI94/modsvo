@@ -9,7 +9,7 @@ mod tests{
 	
 	
 
-    use modsvo::{octant_meta::OctantPlacement,octant_storage_trait::{OctantStorage, ModifiableOctantStorage}, octree_base::{SearchControlFlow, SearchControlFlowResult, SubdivisionControlFlow}, octant_meta::Depth, SparseOctreeHashed};
+    use modsvo::{octant_meta::{Depth, OctantNeighborDirection, OctantPlacement},octant_storage_trait::{ModifiableOctantStorage, OctantStorage}, octree_base::{SearchControlFlow, SearchControlFlowResult, SubdivisionControlFlow}, SparseOctreeHashed};
 
 	use modsvo::morton_based_storage::morton_octant_id::MortonOctantId;
 	use modsvo::octree_base::OctantIdTypeInfo;
@@ -893,6 +893,8 @@ mod tests{
 				//Some(OctantPlacement::UPPER_TOP_RIGHT)
 			}
 		);
+
+		dbg!(OctantNeighborDirection::directional_octants( dbg!(OctantNeighborDirection::oppose_direction_to(OctantNeighborDirection::E))));
 		//let level4_voxel = dbg!(octree.get_voxel_by_id(&level4).unwrap());
 		
 		//dbg!(level4_voxel.subdivision_depth(octree.get_root_voxel().half_extent()));

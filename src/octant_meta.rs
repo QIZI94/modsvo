@@ -284,6 +284,7 @@ impl OctantNeighborDirection {
 	pub const NEIGHBOR_DIRECTIONS_COUNT: usize = 26;
 	pub const FACING_NEIGHBOR_DIRECTIONS_COUNT: usize = 6;
 	pub const DIAGONAL_NEIGHBOR_DIRECTIONS_COUNT: usize = Self::NEIGHBOR_DIRECTIONS_COUNT - Self::FACING_NEIGHBOR_DIRECTIONS_COUNT;
+	pub const DIRECTIONAL_OCTANTS_COUNT: usize = 4;
 
 	pub const ALL_DIRECTIONS: [Self; Self::NEIGHBOR_DIRECTIONS_COUNT] = [
 		Self::U,
@@ -356,5 +357,123 @@ impl OctantNeighborDirection {
 		Self::DSE,
 		Self::DSW
 	];
+
+	pub const OPPOSITE_DIRECTIONS_ORDERED: [Self; Self::NEIGHBOR_DIRECTIONS_COUNT] = [
+		// Facing directions
+		// UP
+		Self::D,
+		// DOWN
+		Self::U,
+		// NORTH
+		Self::S,
+		// SOUTH
+		Self::N,
+		// EAST
+		Self::W,
+		// WEST
+		Self::E,
+
+		// Diagonal directions
+		
+		// NORTH-EAST
+		Self::SW,
+		// NORTH-WEST
+		Self::SE,
+		// SOUTH-EAST
+		Self::NW,
+		// SOUTH-WEST
+		Self::NE,
+		
+		
+		// UP-NORTH
+		Self::DS,
+		// UP-SOUTH
+		Self::DN,
+		// UP-EAST
+		Self::DW,
+		// UP-WEST
+		Self::DE,
+		
+		// DOWN-NORTH
+		Self::US,
+		// DOWN-SOUTH
+		Self::UN,
+		// DOWN-EAST
+		Self::UW,
+		// DOWN-WEST
+		Self::UE,
+		
+		// UP-NORTH-EAST
+		Self::DSW,
+		// UP-NORTH-WEST
+		Self::DSE,
+		// UP-SOUTH-EAST
+		Self::DNW,
+		// UP-SOUTH-WEST
+		Self::DNE,
+
+		// DOWN-NORTH-EAST
+		Self::USW,
+		// DOWN-NORTH-WEST
+		Self::USE,
+		// DOWN-SOUTH-EAST
+		Self::UNW,
+		// DOWN-SOUTH-WEST
+		Self::UNE
+	];
+
+	pub const DIRECTIONAL_OCTANTS_ORDERED: [[OctantPlacement; Self::DIRECTIONAL_OCTANTS_COUNT]; Self::FACING_NEIGHBOR_DIRECTIONS_COUNT] = [
+		// Facing directions
+		// UP
+		[
+			OctantPlacement::UPPER_BOTTOM_LEFT,
+			OctantPlacement::UPPER_TOP_LEFT,
+			OctantPlacement::UPPER_BOTTOM_RIGHT,
+			OctantPlacement::UPPER_TOP_RIGHT
+		],
+		// DOWN
+		[
+			OctantPlacement::LOWER_BOTTOM_LEFT,
+			OctantPlacement::LOWER_TOP_LEFT,
+			OctantPlacement::LOWER_BOTTOM_RIGHT,
+			OctantPlacement::LOWER_TOP_RIGHT
+		],
+		// NORTH
+		[
+			OctantPlacement::LOWER_TOP_LEFT,
+			OctantPlacement::UPPER_TOP_LEFT,
+			OctantPlacement::LOWER_TOP_RIGHT,
+			OctantPlacement::UPPER_TOP_RIGHT
+		],
+		// SOUTH
+		[
+			OctantPlacement::LOWER_BOTTOM_LEFT,
+			OctantPlacement::UPPER_BOTTOM_LEFT,
+			OctantPlacement::LOWER_BOTTOM_RIGHT,
+			OctantPlacement::UPPER_BOTTOM_RIGHT
+		],
+		// EAST
+		[
+			OctantPlacement::LOWER_BOTTOM_RIGHT,
+			OctantPlacement::LOWER_TOP_RIGHT,	
+			OctantPlacement::UPPER_BOTTOM_RIGHT,
+			OctantPlacement::UPPER_TOP_RIGHT
+		],
+		// WEST
+		[
+			OctantPlacement::LOWER_BOTTOM_LEFT,
+			OctantPlacement::LOWER_TOP_LEFT,	
+			OctantPlacement::UPPER_BOTTOM_LEFT,
+			OctantPlacement::UPPER_TOP_LEFT
+		]
+	];
+
+	pub const fn directional_octants(direction: OctantNeighborDirection) -> [OctantPlacement; Self::DIRECTIONAL_OCTANTS_COUNT] {
+		Self::DIRECTIONAL_OCTANTS_ORDERED[direction as usize]
+	}
+
+	pub const fn oppose_direction_to(direction: OctantNeighborDirection) -> OctantNeighborDirection {
+		Self::OPPOSITE_DIRECTIONS_ORDERED[direction as usize]
+	}
 	
 }
